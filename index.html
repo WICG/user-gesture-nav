@@ -45,6 +45,9 @@
  </head>
   <body>
     <section id='abstract'>
+     We propose a new CSS property `overscroll-action` to control the allowed navigation actions for over-scroll gestures. This allows web applications
+     to opt-out of certain gesture navigations that may be disruptive to their
+     UI.
     </section>
     <section id='sotd'>
       We actively solicit comments on this document either via comments to
@@ -53,8 +56,31 @@
     </section>
 
 
+### Motivation
+Most browsers implement a set of navigations actions that are triggered by user gesture (almost always an `overscroll`). The user-agent relies on heuristics to detect if the gesture should result in a navigation or whether it should be handled by the page. These heuristics may work in general case but fail for certain applications. Such failures are particularly problematic because a navigation action is a major context switch that disrupts user experience.
+
+Over time, web developers have resorted to a set of workarounds to disable these navigation gestures either to prevent said disruptions or to implement their own customized versions. Unfortunately these workarounds are not always reliable and have major drawbacks. We believe a simple and reliable way to control these gesture
+navigation will go a long way to address this platform pain point.
+
+A survey of current gesture navigations:
+
+* **Pull-to-refresh**: Mobile Chrome and Opera
+* **Over-scroll swipes** : Chrome, Desktop Safari, Desktop Firefox, IE, Edge^^
+* **Scroll from edge**: Mobile Safari
+
+^^ Current stable release of Microsoft Edge has no gesture navigation but they are adding [support][edgeHTML-feature] for overscroll swipes due to popular demand.
+
+
+### Usecases
+TODO
+
+### Proposed Syntax
+
+
+
 [wicg-thread]: https://discourse.wicg.io/t/proposal-api-to-control-user-gesture-navigation/1536
 [github-repo]: https://github.com/majido/user-gesture-nav-proposal
 
+[edgeHTML-feature]: https://blogs.windows.com/windowsexperience/2016/05/16/announcing-windows-10-mobile-insider-preview-build-14342/
 </body>
 </html>

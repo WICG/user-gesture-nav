@@ -66,15 +66,15 @@ action is a major context switch that disrupts user experience.
 Over time, web developers have resorted to a set of workarounds to disable these navigation gestures
 either to prevent said disruptions or to implement their own customized versions. Unfortunately
 these workarounds are not always reliable and have major drawbacks. We believe a simple and reliable
-way to control these gesture navigation will go a long way to address this platform pain point.
+way to control these navigation gestures will go a long way to address this platform pain point.
 
-A survey of current gesture navigations:
+A survey of current navigation gestures:
 
 * **Pull-to-refresh**: Mobile Chrome and Opera
 * **Overscroll swipes** : Chrome, Desktop Safari, Desktop Firefox, IE, Edge^^
 * **Scroll from edge**: Mobile Safari
 
-^^ Current stable release of Microsoft Edge has no gesture navigation but they are adding [support
+^^ Current stable release of Microsoft Edge has no navigation gesture but they are adding [support
 ][edgeHTML-feature] for overscroll swipes due to popular demand.
 
 
@@ -97,9 +97,9 @@ backward and forward in history when a user swipes left or right and overscrolls
 page layouts (e.g., a page with edge-to-edge horizontal image carousel) it is very easy for a user
 to trigger these navigation actions accidentally once they have reached the page extent.
 
-Examples of developers trying to find a solution [here][swipe-workaround1], [here][swipe-
-workaround2], [here][swipe-workaround3], and [here][swipe-workaround4]. Appendix contains a list of
-existing problematic workarounds for this.
+Examples of developers trying to find a solution [here][swipe-workaround1], [here][swipe-workaround2],
+[here][swipe-workaround3], and [here][swipe-workaround4]. Appendix contains a list of existing
+problematic workarounds for this.
 
 ## Proposed Syntax
 We introduce a non-inherited CSS property `overscroll-action`, that may be specified on the root
@@ -168,11 +168,12 @@ cases separately starting with the disable use-case for the following reasons:
 
 
 ## Links
-* Chrome [Pull-to-Refresh design document](https://docs.google.com/document/d/12Ay4s3NWake8Qd6xQeGiYimGJ_gCe0UMDZKwP9Ni4m8/edit#) by jdduke@
-* Refresh event [www-dom proposal](https://lists.w3.org/Archives/Public/www-dom/2015AprJun/0022.html) by rbyers@
-* Proposal for a [property on app manifest](https://github.com/w3c/manifest/issues/398) on w3c-manifest by jdduke@
+* Chrome [Pull-to-Refresh design document][p2r-design] by jdduke@
+* Refresh event [www-dom proposal][www-dom-proposal] by rbyers@
+* Proposal for a [property on app manifest][manifest-proposal] on w3c-manifest by jdduke@
 * [Original suggestion][css-proposal-origin] for using a CSS property.
-* Chromium [bug](https://bugs.chromium.org/p/chromium/issues/detail?id=465423) tracking our progress
+* Chromium [bug][crbug] tracking our progress
+
 
 ## Appendix
 
@@ -204,10 +205,33 @@ Mobile Safari.
   to be scrollable
 
 
+### Alternative Solutions Considered
+
+* Viewport Meta Tags: A CSS, or Javascript based solution is preferable to meta tags. Such a
+  solution only applies to viewport overscrolling and currently the viewport meta tag is not very
+  well specified and supported consistently across browsers so it is not clear if it is a good idea
+  to add more logic to it.
+* [App Manifest][manifest-proposal]: This was rejected as being out of scope for app manifest.
+* Refresh Event ([www-dom proposal][www-dom-proposal] by rbyers@): This seem to be favored by some
+  web developers as it provides a path to customize the "refresh" action and not just disabling it.
+  * Does not cover swipe navigations but perhaps a more generic navigation event can be used.
+  * This ties navigation action and its UI affordance to the main thread (aka slow path) which can
+    introduce delay into navigation process and prevent smooth UI affordance.
+  * Mozilla engineers were concerned that such an event should be applicable to all refresh
+    affordances on all platforms with an escape hatch for hard reloads and not just p2r.
+  * See additional discussion below on Disabling vs Customizing.
+* Attributes on navigator (e.g., Navigator.refreshEnabled, Navigator.swipeNavigationEnabled): This
+  works fine but it seems a CSS property is a more natural way to control this.
+
+
 
 [wicg-thread]: https://discourse.wicg.io/t/proposal-api-to-control-user-gesture-navigation/1536
 [github-repo]: https://github.com/majido/user-gesture-nav-proposal
+[p2r-design]: https://docs.google.com/document/d/12Ay4s3NWake8Qd6xQeGiYimGJ_gCe0UMDZKwP9Ni4m8/edit#
+[crbug]: https://bugs.chromium.org/p/chromium/issues/detail?id=465423
 [css-proposal-origin]: https://github.com/w3c/manifest/issues/398#issuecomment-133478796
+[manifest-proposal]: https://github.com/w3c/manifest/issues/398
+[www-dom-proposal]: https://lists.w3.org/Archives/Public/www-dom/2015AprJun/0022.html
 [edgeHTML-feature]: https://blogs.windows.com/windowsexperience/2016/05/16/announcing-windows-10-mobile-insider-preview-build-14342/
 [p2r-workarounds]: http://stackoverflow.com/questions/29008194/disabling-androids-chrome-pull-down-to-refresh-feature
 [swipe-workaround1]: http://stackoverflow.com/questions/13654238/can-i-disable-ie10-history-swipe-gesture/27935785#27935785

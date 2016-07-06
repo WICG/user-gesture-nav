@@ -46,8 +46,8 @@
   <body>
     <section id='abstract'>
       We propose a new CSS property `overscroll-action` to control the allowed navigation actions
-      for overscroll gestures. This enables web applications to opt-out of certain gesture
-      navigations that may be disruptive to their UI.
+      for overscroll gestures. This enables web applications to opt-out of certain navigation
+      gestures that may be disruptive to their UI.
     </section>
     <section id='sotd'>
       We actively solicit comments on this document either via comments to
@@ -138,8 +138,10 @@ keeping platform UI consistent so browsers may not be willing to expose a way to
 However this proposed syntax for CSS property does not prohibit its extension in order to cover that
 case as long as we expand it to non-root scrollables.
 
-### Navigation for gestures outside page content
-Navigation gestures that do not need to compose with page content, e.g., swiping URL bar.
+### Navigation gestures outside page content
+Navigation gestures that do not need to compose with page content, e.g., swiping URL bar, are
+outside the scope of these proposal. Web pages do not need to (and perhaps should not) control these
+gestures
 
 ## Feature Detection and Polyfillability
 

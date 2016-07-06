@@ -82,16 +82,14 @@ A survey of current gesture navigations:
 ### Disabling Pull-to-Refresh
 Pull to refresh is a feature of Mobile Chrome (and Opera) where once the user overscrolls the page, the browser shows a refresh animation and refreshes the page. The UX pattern was popularized by native mobile applications as a way to fetch new content which in the context of the browser translates to refreshing the page. However refreshing the page does not make sense and is not relevant for some mobile web applications and can be disruptive and costly.
 
-Below is a list of few workarounds used by apps to disable pull-to-refresh behaviour which come with their own negative consequences:
+[Here][p2r-workarounds] is one example of developers trying to find solution to this. Appendix contains a list of existing problematic workarounds for this.
 
-1. Disable document scrolling, move all content in a scrollable div
-  * Cons: forces a certain layout and loses top controls behaviour.
-2. Disable vertical scrolling all together using ‘touch-action: none;’
-  * Cons: Opting out of the user-agent scrolling machinery is over-kill and adds a lot of complexity to the application.
-3. Add touch event handlers and prevent scroll if gesture is scrolling vertically in a way that induces a refresh (example: AMP implementation)
-  * Cons: touch event handlers has perf implications for threaded scrolling and should be avoided if possible. Also this can become flaky if the app hits touch ack timeout.
 
-See this [stackoverflow thread][p2r-workarounds] for more.
+### Disabling Swipe Navigations
+Most major mobile and desktop browsers provide a swipe navigation feature where they
+navigate backward and forward in history when a user swipes left or right and overscrolls the page. In some page layouts (e.g., a page with edge-to-edge horizontal image carousel) it is very easy for a user to trigger these navigation actions accidentally once they have reached the page extent.
+
+Examples of developers trying to find a solution [here][swipe-workaround1], [here][swipe-workaround2], [here][swipe-workaround3], and [here][swipe-workaround4]. Appendix contains a list of existing problematic workarounds for this.
 
 ## Proposed Syntax
 We introduce a non-inherited CSS property `overscroll-action`, that may be specified on the root element and applies to the viewport. It controls the permitted overscroll actions by the browser.
@@ -142,6 +140,25 @@ Some web applications (e.g., twitter) may be interested in keeping the pull-to-r
 * [Original suggestion][css-proposal-origin] for using a CSS property.
 * Chromium [bug](https://bugs.chromium.org/p/chromium/issues/detail?id=465423) tracking our progress
 
+## Appendix
+
+### Pull-to-refresh existing workarounds
+Below is a list of few workarounds used by apps to disable pull-to-refresh behaviour which come with their own negative consequences:
+
+1. Disable document scrolling, move all content in a scrollable div
+  * Cons: forces a certain layout and loses top controls behaviour.
+2. Disable vertical scrolling all together using ‘touch-action: none;’
+  * Cons: Opting out of the user-agent scrolling machinery is over-kill and adds a lot of complexity to the application.
+3. Add touch event handlers and prevent scroll if gesture is scrolling vertically in a way that induces a refresh (example: AMP implementation)
+  * Cons: touch event handlers has perf implications for threaded scrolling and should be avoided if possible. Also this can become flaky if the app hits touch ack timeout.
+
+### Swipe navigation workarounds
+There are several workarounds but similar to pull-to-refresh these are either unreliable, or complicated, or have performance drawbacks, or a combination of these. Also none of these work in Mobile Safari.
+
+* Prevent-defaulting touch event handlers (or wheel event for desktop browsers) similar to pull-to-refresh.
+* Using `touch-action: pan-y` on document to prevent horizontal (or vertical pan)
+* Use scroll chaining: This is an IE specific workaround and disables scroll chaining (`--ms-scroll-chaining: none`) on root scroller. This actually does not work well in practice as it only prevents overscroll action if the page is not scrolled fully to its extent and requires the page to be scrollable
+
 
 
 [wicg-thread]: https://discourse.wicg.io/t/proposal-api-to-control-user-gesture-navigation/1536
@@ -149,5 +166,10 @@ Some web applications (e.g., twitter) may be interested in keeping the pull-to-r
 [css-proposal-origin]: https://github.com/w3c/manifest/issues/398#issuecomment-133478796
 [edgeHTML-feature]: https://blogs.windows.com/windowsexperience/2016/05/16/announcing-windows-10-mobile-insider-preview-build-14342/
 [p2r-workarounds]: http://stackoverflow.com/questions/29008194/disabling-androids-chrome-pull-down-to-refresh-feature
+[swipe-workaround1]: http://stackoverflow.com/questions/13654238/can-i-disable-ie10-history-swipe-gesture/27935785#27935785
+[swipe-workaround2]: http://stackoverflow.com/questions/18889666/ios-7-is-there-a-way-to-disable-the-swipe-back-and-forward-functionality-in-sa
+[swipe-workaround3]: http://stackoverflow.com/questions/23560528/how-to-prevent-overscroll-history-navigation-without-preventing-touchstart
+[swipe-workaround4]: http://stackoverflow.com/questions/30636930/disable-web-page-navigation-on-swipeback-and-forward
+
 </body>
 </html>

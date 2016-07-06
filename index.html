@@ -45,9 +45,9 @@
  </head>
   <body>
     <section id='abstract'>
-     We propose a new CSS property `overscroll-action` to control the allowed navigation actions for over-scroll gestures. This allows web applications
-     to opt-out of certain gesture navigations that may be disruptive to their
-     UI.
+      We propose a new CSS property `overscroll-action` to control the allowed navigation actions
+      for overscroll gestures. This enables web applications to opt-out of certain gesture
+      navigations that may be disruptive to their UI.
     </section>
     <section id='sotd'>
       We actively solicit comments on this document either via comments to
@@ -56,31 +56,98 @@
     </section>
 
 
-### Motivation
-Most browsers implement a set of navigations actions that are triggered by user gesture (almost always an `overscroll`). The user-agent relies on heuristics to detect if the gesture should result in a navigation or whether it should be handled by the page. These heuristics may work in general case but fail for certain applications. Such failures are particularly problematic because a navigation action is a major context switch that disrupts user experience.
+## Motivation
+Most browsers implement a set of navigations actions that are triggered by user gesture (almost
+always an `overscroll`). The user-agent relies on heuristics to detect if the gesture should result
+in a navigation or whether it should be handled by the page. These heuristics may work in general
+case but fail for certain applications. Such failures are particularly problematic because a
+navigation action is a major context switch that disrupts user experience.
 
-Over time, web developers have resorted to a set of workarounds to disable these navigation gestures either to prevent said disruptions or to implement their own customized versions. Unfortunately these workarounds are not always reliable and have major drawbacks. We believe a simple and reliable way to control these gesture
-navigation will go a long way to address this platform pain point.
+Over time, web developers have resorted to a set of workarounds to disable these navigation gestures
+either to prevent said disruptions or to implement their own customized versions. Unfortunately
+these workarounds are not always reliable and have major drawbacks. We believe a simple and reliable
+way to control these gesture navigation will go a long way to address this platform pain point.
 
 A survey of current gesture navigations:
 
 * **Pull-to-refresh**: Mobile Chrome and Opera
-* **Over-scroll swipes** : Chrome, Desktop Safari, Desktop Firefox, IE, Edge^^
+* **Overscroll swipes** : Chrome, Desktop Safari, Desktop Firefox, IE, Edge^^
 * **Scroll from edge**: Mobile Safari
 
 ^^ Current stable release of Microsoft Edge has no gesture navigation but they are adding [support][edgeHTML-feature] for overscroll swipes due to popular demand.
 
 
-### Usecases
-TODO
+## Usecases
 
-### Proposed Syntax
+### Disabling Pull-to-Refresh
+Pull to refresh is a feature of Mobile Chrome (and Opera) where once the user overscrolls the page, the browser shows a refresh animation and refreshes the page. The UX pattern was popularized by native mobile applications as a way to fetch new content which in the context of the browser translates to refreshing the page. However refreshing the page does not make sense and is not relevant for some mobile web applications and can be disruptive and costly.
+
+Below is a list of few workarounds used by apps to disable pull-to-refresh behaviour which come with their own negative consequences:
+
+1. Disable document scrolling, move all content in a scrollable div
+  * Cons: forces a certain layout and loses top controls behaviour.
+2. Disable vertical scrolling all together using ‘touch-action: none;’
+  * Cons: Opting out of the user-agent scrolling machinery is over-kill and adds a lot of complexity to the application.
+3. Add touch event handlers and prevent scroll if gesture is scrolling vertically in a way that induces a refresh (example: AMP implementation)
+  * Cons: touch event handlers has perf implications for threaded scrolling and should be avoided if possible. Also this can become flaky if the app hits touch ack timeout.
+
+See this [stackoverflow thread][p2r-workarounds] for more.
+
+## Proposed Syntax
+We introduce a non-inherited CSS property `overscroll-action`, that may be specified on the root element and applies to the viewport. It controls the permitted overscroll actions by the browser.
+
+`overscroll-action: [auto || [no-navigation-x | no-navigation-y]]`
+
+The syntax forces the developer to be explicit about the actions that they want to prevent. The granular control that this approach provides means that it is easier for user-agents to add additional new overscroll actions or provide additional fine-grained control i.e., per-direction controls.
+
+
+* `auto`: The user agent determines appropriate default action for overscrolls in this axis and direction.
+* `no-navigation-x`: overscroll on x axis should not cause any navigation such as back or forward history navigation. This value does not impact UI effects such as bounce or glow.
+
+* `no-navigation-y`: overscroll on x axis should not cause any navigation such as a page refresh. This value does not impact UI effects such as bounce or glow.
+
+
+*Syntax alternatives*:
+`overscroll-action-{x,y}: [auto || none]`
+
+This syntax mimics overflow-{x,y} syntax and allows controlling x and y axis separately making it easier for different components to control the behaviour on each axis without coordination (e.g., a routing library may want to control vertical overscroll, and a carousel may want to control horizontal overscroll).
+
+## Out of Scope
+The following cases are out of scope for this proposal
+
+### Cosmetic overscroll effects
+Cosmetic overscroll effects such as glow, or bounce are out of scope of this proposal. Unlike navigation, these affordances do not cause a drastic context-switch and usually play a role in keeping platform UI consistent so browsers may not be willing to expose a way to disable them. However this proposed syntax for CSS property does not prohibit its extension in order to cover that case as long as we expand it to non-root scrollables.
+
+### Navigation for gestures outside page content
+Navigation gestures that do not need to compose with page content, e.g., swiping URL bar.
+
+## Feature Detection and Polyfillability
+
+Detecting existence of a CSS property is straight forward. A polyfill can use such detection and fallback to using one of the existing workarounds which are unfortunately unreliable and have limited applicability.
+
+
+## Customizing vs Disabling
+Some web applications (e.g., twitter) may be interested in keeping the pull-to-refresh UI affordance but hook their own custom refresh logic replacing the browser's default. This is a different but certainly a valid use-case which is best addressed by an event. We think we should address these two cases separately starting with the disable use-case for the following reasons:
+
+1. The cost of not being able to disable seems to be greater than not being able to customize. Also anecdotally it appears that most apps just want to disable rather than customize so we want to make sure there is a simple API for that. So it is important to address disable first.
+2. Once we have a **reliable** way to disable UA's behaviour, it becomes much easier to create customization on top.
+3. A synchronous event has unacceptable performance characteristic for any UI effect, such as scrolling, that needs to be smooth and potentially run in a separate thread. In these cases we need to know before scrolling starts what effect it can trigger.
+4. There is some awkwardness in addressing both the disable and customize use-cases using a single event e.g., deciding whether pull-to-refresh animation should be shown or not.
+
+
+## Links
+* Chrome [Pull-to-Refresh design document](https://docs.google.com/document/d/12Ay4s3NWake8Qd6xQeGiYimGJ_gCe0UMDZKwP9Ni4m8/edit#) by jdduke@
+* Refresh event [www-dom proposal](https://lists.w3.org/Archives/Public/www-dom/2015AprJun/0022.html) by rbyers@
+* Proposal for a [property on app manifest](https://github.com/w3c/manifest/issues/398) on w3c-manifest by jdduke@
+* [Original suggestion][css-proposal-origin] for using a CSS property.
+* Chromium [bug](https://bugs.chromium.org/p/chromium/issues/detail?id=465423) tracking our progress
 
 
 
 [wicg-thread]: https://discourse.wicg.io/t/proposal-api-to-control-user-gesture-navigation/1536
 [github-repo]: https://github.com/majido/user-gesture-nav-proposal
-
+[css-proposal-origin]: https://github.com/w3c/manifest/issues/398#issuecomment-133478796
 [edgeHTML-feature]: https://blogs.windows.com/windowsexperience/2016/05/16/announcing-windows-10-mobile-insider-preview-build-14342/
+[p2r-workarounds]: http://stackoverflow.com/questions/29008194/disabling-androids-chrome-pull-down-to-refresh-feature
 </body>
 </html>

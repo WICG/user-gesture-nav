@@ -107,27 +107,16 @@ element and applies to the viewport. It controls the permitted overscroll action
 
 `overscroll-action: [auto || [no-navigation-x | no-navigation-y]]`
 
-* `auto`: The user agent determines appropriate default action for overscrolls in this axis and
-  direction. This is the default value.
+* `auto`: The user agent determines appropriate default action for overscrolls. This is the default
+  value.
 * `no-navigation-x`: overscroll on x axis should not cause any navigation such as back or forward
   history navigation. This value does not impact UI effects such as bounce or glow.
 * `no-navigation-y`: overscroll on x axis should not cause any navigation such as a page refresh.
   This value does not impact UI effects such as bounce or glow.
 
-This syntax forces the developer to be explicit about the actions that they want to prevent. The
-granular control that this approach provides means that it is easier for user-agents to add
-additional new overscroll actions or more fine-grained control, e.g., per-direction, in future.
-
-
-*Syntax alternatives*:
-
-`overscroll-action-{x,y}: [auto || none]`
-
-This syntax mimics overflow-{x,y} syntax and allows controlling x and y axis separately making it
-easier for different components to control the behaviour on each axis without coordination (e.g., a
-routing library may want to control vertical overscroll, and a carousel may want to control
-horizontal overscroll). However it lack the flexibility and fine grained control of the previous
-one.
+This syntax makes it so that the author has to opt-out of specific actions that they want to
+prevent. This improves forward compatibility and makes it easier for user-agents to add additional
+overscroll actions or finer grained control, e.g., per-direction, in future.
 
 ## Out of Scope
 
@@ -224,6 +213,15 @@ Mobile Safari.
 * Attributes on navigator (e.g., Navigator.refreshEnabled, Navigator.swipeNavigationEnabled): This
   works fine but it seems a CSS property is a more natural way to control this.
 
+
+### Alternative Syntax Considered
+`overscroll-action-{x,y}: [auto || none]`
+
+This syntax mimics overflow-{x,y} syntax. It is simple and allows controlling x and y axis
+separately making it easier for different components to control the behaviour on each axis without
+coordination (e.g., a routing library may want to control vertical overscroll, and a carousel may
+want to control horizontal overscroll). However it lacks the flexibility and fine grained control of
+the proposed syntax.
 
 
 [wicg-thread]: https://discourse.wicg.io/t/proposal-api-to-control-user-gesture-navigation/1536

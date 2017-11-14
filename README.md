@@ -1,3 +1,9 @@
+
+# DEPRECATED
+
+This proposal in now superceded by [overscroll-behavior](https://wicg.github.io/overscroll-behavior).
+
+
 # User Gesture Navigation API
 
 [Specification](https://wicg.github.io/user-gesture-nav) for a new API to control the allowed
